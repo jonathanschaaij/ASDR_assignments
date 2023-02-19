@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/brightness_node.dir/src/brightness_node.cpp.o -o brightness_node 

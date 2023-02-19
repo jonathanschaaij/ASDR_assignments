@@ -1,0 +1,6 @@
+Invoking command in '/home/ram-user/ASDR_assignments/build/brightness_pkg': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/ram-user/ASDR_assignments/src/brightness_pkg -DCMAKE_INSTALL_PREFIX=/home/ram-user/ASDR_assignments/install/brightness_pkg
+Invoked command in '/home/ram-user/ASDR_assignments/build/brightness_pkg' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/ram-user/ASDR_assignments/src/brightness_pkg -DCMAKE_INSTALL_PREFIX=/home/ram-user/ASDR_assignments/install/brightness_pkg
+Invoking command in '/home/ram-user/ASDR_assignments/build/brightness_pkg': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/ram-user/ASDR_assignments/build/brightness_pkg -- -j6 -l6
+Invoked command in '/home/ram-user/ASDR_assignments/build/brightness_pkg' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/ram-user/ASDR_assignments/build/brightness_pkg -- -j6 -l6
+Invoking command in '/home/ram-user/ASDR_assignments/build/brightness_pkg': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/ram-user/ASDR_assignments/build/brightness_pkg
+Invoked command in '/home/ram-user/ASDR_assignments/build/brightness_pkg' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/ram-user/ASDR_assignments/build/brightness_pkg

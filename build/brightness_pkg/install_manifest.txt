@@ -1,0 +1,16 @@
+/home/ram-user/ASDR_assignments/install/brightness_pkg/lib/brightness_pkg/brightness_node
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/ament_index/resource_index/package_run_dependencies/brightness_pkg
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/ament_index/resource_index/parent_prefix_path/brightness_pkg
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/environment/ament_prefix_path.sh
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/environment/ament_prefix_path.dsv
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/environment/path.sh
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/environment/path.dsv
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/local_setup.bash
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/local_setup.sh
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/local_setup.zsh
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/local_setup.dsv
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/package.dsv
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/ament_index/resource_index/packages/brightness_pkg
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/cmake/brightness_pkgConfig.cmake
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/cmake/brightness_pkgConfig-version.cmake
+/home/ram-user/ASDR_assignments/install/brightness_pkg/share/brightness_pkg/package.xml
