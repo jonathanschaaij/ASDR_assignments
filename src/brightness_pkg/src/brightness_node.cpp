@@ -9,52 +9,35 @@
 
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
- * member function as a callback from the timer. */
-
-// class MinimalPublisher : public rclcpp::Node
-// {
-//   public:
-//     MinimalPublisher()
-//     : Node("minimal_publisher"), count_(0)
-//     {
-//       publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-//       timer_ = this->create_wall_timer(
-//       500ms, std::bind(&MinimalPublisher::timer_callback, this));
-//     }
-
-//   private:
-//     void timer_callback()
-//     {
-//       auto message = std_msgs::msg::String();
-//       message.data = "Hello, world! " + std::to_string(count_++);
-//       RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-//       publisher_->publish(message);
-//     }
-//     rclcpp::TimerBase::SharedPtr timer_;
-//     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-//     size_t count_;
-// };
-
 class BrightnessReader : public rclcpp::Node
 {
 public:
   BrightnessReader()
-      : Node("brighness_node"), count_(0)
+      : Node("brightness_node"), count_(0)
   {
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+    this->declare_parameter("threshold", 80.0);
+    threshold =
+        this->get_parameter("threshold").get_parameter_value().get<double>();
+    RCLCPP_INFO(this->get_logger(), "Starting Threshold: %0.2f", threshold);
+    publisher_ = this->create_publisher<std_msgs::msg::String>("lightState", 10);
     subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
         "image", 10, std::bind(&BrightnessReader::topic_callback, this, std::placeholders::_1));
   }
 
 private:
-  // void topic_callback(const std_msgs::msg::String & msg) const
   void topic_callback(const sensor_msgs::msg::Image::SharedPtr msg) const
   {
     if (!msg)
     {
       RCLCPP_ERROR(this->get_logger(), "Received null message");
       return;
+    }
+    double setThreshold =
+        this->get_parameter("threshold").get_parameter_value().get<double>();
+    if (setThreshold != threshold)
+    {
+      RCLCPP_INFO(this->get_logger(), "Threshold changed: %0.2f->%0.2f", threshold, setThreshold);
+      threshold = setThreshold;
     }
 
     double total_brightness = 0.0;
@@ -68,11 +51,27 @@ private:
       }
     }
     double average_brightness = total_brightness / (msg->width * msg->height);
+    RCLCPP_INFO(this->get_logger(), "Average brightness=%0.2f", average_brightness);
 
-    RCLCPP_INFO(this->get_logger(), "I got data : B=%0.2f", average_brightness);
+    // Send message when state changed
+    auto message = std_msgs::msg::String();
+    if (average_brightness > threshold && !lightState)
+    {
+      lightState = true;
+      message.data = "Switched to Light!";
+      publisher_->publish(message);
+    }
+    else if (average_brightness < threshold && lightState)
+    {
+      lightState = false;
+      message.data = "Switched to Dark!";
+      publisher_->publish(message);
+    }
   }
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+  mutable double threshold;
+  mutable bool lightState = true;
   size_t count_;
 };
 

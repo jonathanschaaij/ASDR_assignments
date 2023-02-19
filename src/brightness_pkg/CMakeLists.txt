@@ -13,7 +13,9 @@ find_package(sensor_msgs REQUIRED)
 
 
 add_executable(brightness_node src/brightness_node.cpp)
+add_executable(lightposition_node src/lightposition_node.cpp)
 ament_target_dependencies(brightness_node rclcpp std_msgs sensor_msgs)
+ament_target_dependencies(lightposition_node rclcpp std_msgs sensor_msgs)
 
 # target_include_directories(brightness_node PUBLIC
 #   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -21,7 +23,8 @@ ament_target_dependencies(brightness_node rclcpp std_msgs sensor_msgs)
 # target_compile_features(brightness_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
 install(TARGETS 
-brightness_node
+  brightness_node
+  lightposition_node
   DESTINATION lib/${PROJECT_NAME})
 
 # if(BUILD_TESTING)
