@@ -145,19 +145,21 @@ private:
     binarypublisher_->publish(binary_msg);
 
     // Get a new target
-    float gain = 0.01;
-    target[0] += (x_cog/(width)-2) * gain;
+    float gain = 0.5;
+    // target[0] += (x_pos/(2.0*width) - 1) * gain;
     // target[0] = max(-0.8, min(0.8, target[0]));
 
-    target[1] -= (y_cog/(height)-2) * gain;
+    // target[0] += (x_pos/(2.0*width) - 1) * gain;
     // target[1] = max(-0.6, min(0.6, target[1]));
 
 
     asdfr_interfaces::msg::Point2 message;
+    float x_off = (x_cog-width/2)/width * gain;
+    float y_off = (y_cog-height/2)/height * gain;
 
-    message.x = target[0];
-    message.y = target[1];
-    RCLCPP_INFO(this->get_logger(), "Setpoint = (%d, %d)", x_pos, y_pos);
+    message.x = target[0] + x_off;
+    message.y = target[1] - y_off;
+    RCLCPP_INFO(this->get_logger(), "COG(%d,%d) Target = (%.2f, %.2f), OFFset(%.2f, %.2f)", x_pos, y_pos, target[0], target[1], x_off, y_off);
     targetpublisher_->publish(message);
   };
   

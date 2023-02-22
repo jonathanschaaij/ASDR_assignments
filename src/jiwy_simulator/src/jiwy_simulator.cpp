@@ -252,7 +252,7 @@ private:
     pos.x = dynamics_simulation_.get_x();
     pos.y = dynamics_simulation_.get_y();
     position_topic_->publish(pos);
-    RCLCPP_INFO(this->get_logger(), "Current position = [%f,%f]", pos.x, pos.y);
+    // RCLCPP_INFO(this->get_logger(), "Current position = [%f,%f]", pos.x, pos.y);
   }
 };
 
