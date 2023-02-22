@@ -18,8 +18,13 @@ public:
 
     RCLCPP_INFO(this->get_logger(), "Starting light position reader");
     publisher_ = this->create_publisher<std_msgs::msg::String>("lightPosition", 10);
+
     subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
         "image", 10, std::bind(&LightPositionReader::topic_callback, this, std::placeholders::_1));
+
+    greyscalepublisher_ = this->create_publisher<sensor_msgs::msg::Image>("grayImage", 10);
+    binarypublisher_ = this->create_publisher<sensor_msgs::msg::Image>("binaryImage", 10);
+    cogpublisher_ = this->create_publisher<sensor_msgs::msg::Image>("cogImage", 10);
   }
 
 private:
@@ -47,20 +52,35 @@ private:
       }
     }
 
+    // Publish the image to the grayscale topic for verification
+    sensor_msgs::msg::Image grayscale_msg;
+    grayscale_msg.header.frame_id = "grayscale_camera";
+    grayscale_msg.height = height;
+    grayscale_msg.width = width;
+    grayscale_msg.encoding = "mono8";                                                 // "mono8" is the encoding for an 8-bit grayscale image
+    grayscale_msg.step = width;                                                       // Number of bytes per row
+    grayscale_msg.data.resize(height * width);                                        // Allocate memory for the image data
+    std::copy(gray_image, gray_image + (height * width), grayscale_msg.data.begin()); // Copy the grayscale image data into the message
+    greyscalepublisher_->publish(grayscale_msg);
+
     // Step 2: Apply a threshold to the grayscale image
     const int threshold_value = 100;
-    unsigned char *binary_image = new unsigned char[width * height];
+    unsigned char *binary_image = new unsigned char[width * height * 3];
     for (int i = 0; i < height; i++)
     {
       for (int j = 0; j < width; j++)
       {
         if (gray_image[i * width + j] > threshold_value)
         {
-          binary_image[i * width + j] = 255;
+          binary_image[(i * width + j) * 3] = 255;     // Red channel
+          binary_image[(i * width + j) * 3 + 1] = 255; // Green channel
+          binary_image[(i * width + j) * 3 + 2] = 255; // Blue channel
         }
         else
         {
-          binary_image[i * width + j] = 0;
+          binary_image[(i * width + j) * 3] = 0;     // Red channel
+          binary_image[(i * width + j) * 3 + 1] = 0; // Green channel
+          binary_image[(i * width + j) * 3 + 2] = 0; // Blue channel
         }
       }
     }
@@ -72,7 +92,7 @@ private:
     {
       for (int j = 0; j < width; j++)
       {
-        if (binary_image[i * width + j] == 255)
+        if (binary_image[(i * width + j) * 3] == 255)
         {
           x_cog += j;
           y_cog += i;
@@ -80,10 +100,45 @@ private:
         }
       }
     }
+    if (num_white_pixels == 0)
+    {
+      num_white_pixels = 1;
+    }
     x_cog /= num_white_pixels;
     y_cog /= num_white_pixels;
 
     RCLCPP_INFO(this->get_logger(), "COG (x,y) = (%0.2f, %0.2f)", x_cog, y_cog);
+
+    int x_pos = static_cast<int>(x_cog);
+    int y_pos = static_cast<int>(y_cog);
+
+    int radius = 5;
+    for (int i = y_pos - radius; i <= y_pos + radius; i++)
+    {
+      for (int j = x_pos - radius; j <= x_pos + radius; j++)
+      {
+        if (i >= 0 && i < height && j >= 0 && j < width)
+        {
+          if ((i - y_pos) * (i - y_pos) + (j - x_pos) * (j - x_pos) <= radius * radius)
+          {
+            binary_image[i * width * 3 + j * 3] = 255;   // Red channel
+            binary_image[i * width * 3 + j * 3 + 1] = 0; // Green channel
+            binary_image[i * width * 3 + j * 3 + 2] = 0; // Blue channel
+          }
+        }
+      }
+    }
+
+    // Publish the image to the grayscale topic for verification
+    sensor_msgs::msg::Image binary_msg;
+    binary_msg.header.frame_id = "binary_camera";
+    binary_msg.height = height;
+    binary_msg.width = width;
+    binary_msg.encoding = "rgb8";                                                          // "rgb8" is the encoding for an 8-bit RGB image
+    binary_msg.step = width * 3;                                                           // Number of bytes per row
+    binary_msg.data.resize(height * width * 3);                                            // Allocate memory for the image data
+    std::copy(binary_image, binary_image + (height * width * 3), binary_msg.data.begin()); // Copy the RGB image data into the message
+    binarypublisher_->publish(binary_msg);
 
     auto message = std_msgs::msg::String();
     message.data = "Got message";
@@ -91,6 +146,10 @@ private:
   };
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr greyscalepublisher_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr binarypublisher_;
+  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr cogpublisher_;
   size_t count_;
 };
 
