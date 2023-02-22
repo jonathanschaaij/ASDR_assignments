@@ -7,13 +7,14 @@ def generate_launch_description():
             package="image_tools",
             executable="cam2image",
             name='camera',
-            parameters=[{"depth": 1}, {"history": "keep_last"}]
+            parameters=[{"depth": 1}, {"history": "keep_last"}],
+            remappings=[('/image','/webcam_input')]
         ),
-        Node(
-            package='brightness_pkg',
-            executable='lightposition_node',
-            name='lightpositionnode'
-        ),
+        # Node(
+        #     package='brightness_pkg',
+        #     executable='lightposition_node',
+        #     name='lightpositionnode'
+        # ),
         # Node(
         #     package='image_tools',
         #     executable='showimage',
@@ -25,12 +26,12 @@ def generate_launch_description():
         #     name='grayImage',
         #    arguments=["image:=/grayImage"]
         # ),
-        Node(
-            package='image_tools',
-            executable='showimage',
-            name='binaryImage',
-            arguments=["image:=/binaryImage"]
-        ),
+        # Node(
+        #     package='image_tools',
+        #     executable='showimage',
+        #     name='binaryImage',
+        #     arguments=["image:=/binaryImage"]
+        # ),
         Node(
             package='jiwy_simulator',
             executable='jiwy_simulator',
@@ -40,5 +41,11 @@ def generate_launch_description():
             package='jiwy_simulator',
             executable='jiwy_tester',
             name='jiwyTester'
+        ),
+        Node(
+            package='image_tools',
+            executable='showimage',
+            name='jiwy_out',
+            arguments=["image:=/moving_camera_output"]
         ),
     ])

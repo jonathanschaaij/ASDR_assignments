@@ -16,6 +16,7 @@ public:
     JiwyTester()
         : Node("jiwytest_node")
     {
+        count = 0;
         RCLCPP_INFO(this->get_logger(), "Starting Jiwytester");
         publisher_ = this->create_publisher<asdfr_interfaces::msg::Point2>("setpoint", 10);
 
@@ -27,10 +28,13 @@ private:
     void timer_callback()
     {
         auto message = asdfr_interfaces::msg::Point2();
-        message.x = 1;
-        message.y = 1;
+        int vals[] = {1,1,-1,-1};
+        count++;
+        message.x = vals[count%4];
+        message.y = vals[(count+1)%4];
         publisher_->publish(message);
     }
+    size_t count;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Publisher<asdfr_interfaces::msg::Point2>::SharedPtr publisher_;
 };
