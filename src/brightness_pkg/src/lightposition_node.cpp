@@ -21,7 +21,10 @@ public:
     publisher_ = this->create_publisher<std_msgs::msg::String>("lightPosition", 10);
 
     subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "image", 10, std::bind(&LightPositionReader::topic_callback, this, std::placeholders::_1));
+        "moving_camera_output", 10, std::bind(&LightPositionReader::topic_callback, this, std::placeholders::_1));
+
+    pos_subscription_ = this->create_subscription<asdfr_interfaces::msg::Point2>(
+        "position", 10, std::bind(&LightPositionReader::position_callback, this, std::placeholders::_1));
 
     greyscalepublisher_ = this->create_publisher<sensor_msgs::msg::Image>("grayImage", 10);
     binarypublisher_ = this->create_publisher<sensor_msgs::msg::Image>("binaryImage", 10);
@@ -130,7 +133,7 @@ private:
       }
     }
 
-    // Publish the image to the grayscale topic for verification
+    // Publish the image to the binary topic for verification
     sensor_msgs::msg::Image binary_msg;
     binary_msg.header.frame_id = "binary_camera";
     binary_msg.height = height;
@@ -141,22 +144,39 @@ private:
     std::copy(binary_image, binary_image + (height * width * 3), binary_msg.data.begin()); // Copy the RGB image data into the message
     binarypublisher_->publish(binary_msg);
 
-    // auto message = std_msgs::msg::String();
-    // message.data = "Se";
-    // publisher_->publish(message);
+    // Get a new target
+    float gain = 0.01;
+    target[0] += (x_cog/(width)-2) * gain;
+    // target[0] = max(-0.8, min(0.8, target[0]));
+
+    target[1] -= (y_cog/(height)-2) * gain;
+    // target[1] = max(-0.6, min(0.6, target[1]));
+
 
     asdfr_interfaces::msg::Point2 message;
-    message.x = x_cog;
-    message.y = y_cog;
+
+    message.x = target[0];
+    message.y = target[1];
     RCLCPP_INFO(this->get_logger(), "Setpoint = (%d, %d)", x_pos, y_pos);
     targetpublisher_->publish(message);
   };
+  
+
+  void position_callback(const asdfr_interfaces::msg::Point2 pos) const
+  {
+    target[0]=pos.x;
+    target[1]=pos.y;
+  }
+
+
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
+  rclcpp::Subscription<asdfr_interfaces::msg::Point2>::SharedPtr pos_subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr greyscalepublisher_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr binarypublisher_;
   rclcpp::Publisher<asdfr_interfaces::msg::Point2>::SharedPtr targetpublisher_;
+  mutable float target[2] = {0,0};
   size_t count_;
 };
 

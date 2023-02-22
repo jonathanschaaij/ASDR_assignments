@@ -40,6 +40,8 @@ private:
       threshold = setThreshold;
     }
 
+
+    // Compute average brightness
     double total_brightness = 0.0;
     for (unsigned int i = 0; i < msg->height; i++)
     {
