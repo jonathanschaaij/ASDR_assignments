@@ -13,14 +13,16 @@ find_package(sensor_msgs REQUIRED)
 find_package(asdfr_interfaces REQUIRED)
 
 add_executable(jiwy_simulator src/jiwy_simulator.cpp)
+add_executable(jiwy_tester src/jiwy_tester.cpp)
 ament_target_dependencies(jiwy_simulator rclcpp std_msgs sensor_msgs asdfr_interfaces)
+ament_target_dependencies(jiwy_tester rclcpp std_msgs sensor_msgs asdfr_interfaces)
 
 target_include_directories(jiwy_simulator PUBLIC
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include>)
 target_compile_features(jiwy_simulator PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-install(TARGETS jiwy_simulator
+install(TARGETS jiwy_simulator jiwy_tester
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
