@@ -10,12 +10,12 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
-
+find_package(asdfr_interfaces REQUIRED)
 
 add_executable(brightness_node src/brightness_node.cpp)
 add_executable(lightposition_node src/lightposition_node.cpp)
 ament_target_dependencies(brightness_node rclcpp std_msgs sensor_msgs)
-ament_target_dependencies(lightposition_node rclcpp std_msgs sensor_msgs)
+ament_target_dependencies(lightposition_node rclcpp std_msgs sensor_msgs asdfr_interfaces)
 
 # target_include_directories(brightness_node PUBLIC
 #   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

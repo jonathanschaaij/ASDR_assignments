@@ -6,6 +6,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "sensor_msgs/msg/image.hpp"
+#include "asdfr_interfaces/msg/point2.hpp"
 
 using namespace std::chrono_literals;
 
@@ -24,7 +25,7 @@ public:
 
     greyscalepublisher_ = this->create_publisher<sensor_msgs::msg::Image>("grayImage", 10);
     binarypublisher_ = this->create_publisher<sensor_msgs::msg::Image>("binaryImage", 10);
-    cogpublisher_ = this->create_publisher<sensor_msgs::msg::Image>("cogImage", 10);
+    targetpublisher_ = this->create_publisher<asdfr_interfaces::msg::Point2>("setpoint", 10);
   }
 
 private:
@@ -107,7 +108,7 @@ private:
     x_cog /= num_white_pixels;
     y_cog /= num_white_pixels;
 
-    RCLCPP_INFO(this->get_logger(), "COG (x,y) = (%0.2f, %0.2f)", x_cog, y_cog);
+    // RCLCPP_INFO(this->get_logger(), "COG (x,y) = (%0.2f, %0.2f)", x_cog, y_cog);
 
     int x_pos = static_cast<int>(x_cog);
     int y_pos = static_cast<int>(y_cog);
@@ -140,16 +141,22 @@ private:
     std::copy(binary_image, binary_image + (height * width * 3), binary_msg.data.begin()); // Copy the RGB image data into the message
     binarypublisher_->publish(binary_msg);
 
-    auto message = std_msgs::msg::String();
-    message.data = "Got message";
-    publisher_->publish(message);
+    // auto message = std_msgs::msg::String();
+    // message.data = "Se";
+    // publisher_->publish(message);
+
+    asdfr_interfaces::msg::Point2 message;
+    message.x = x_cog;
+    message.y = y_cog;
+    RCLCPP_INFO(this->get_logger(), "Setpoint = (%d, %d)", x_pos, y_pos);
+    targetpublisher_->publish(message);
   };
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr greyscalepublisher_;
   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr binarypublisher_;
-  rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr cogpublisher_;
+  rclcpp::Publisher<asdfr_interfaces::msg::Point2>::SharedPtr targetpublisher_;
   size_t count_;
 };
 
