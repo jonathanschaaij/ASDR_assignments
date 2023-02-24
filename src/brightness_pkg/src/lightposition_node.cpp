@@ -20,6 +20,15 @@ public:
     RCLCPP_INFO(this->get_logger(), "Starting light position reader");
     publisher_ = this->create_publisher<std_msgs::msg::String>("lightPosition", 10);
 
+    this->declare_parameter("inputimage", "image");
+    inputimage = this->get_parameter("inputimage").get_parameter_value().get<std::string>();
+    RCLCPP_INFO(this->get_logger(), "(SET PARAM) Analyzing inputsource: %s", inputimage.c_str());
+
+    this->declare_parameter("threshold", 240.0);
+    threshold =
+        this->get_parameter("threshold").get_parameter_value().get<double>();
+    RCLCPP_INFO(this->get_logger(), "(SET PARAM) Threshold: %0.2f", threshold);
+
     subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
         "image", 10, std::bind(&LightPositionReader::topic_callback, this, std::placeholders::_1));
 
@@ -35,6 +44,13 @@ private:
     {
       RCLCPP_ERROR(this->get_logger(), "Received null message");
       return;
+    }
+    double setThreshold =
+        this->get_parameter("threshold").get_parameter_value().get<double>();
+    if (setThreshold != threshold)
+    {
+      RCLCPP_INFO(this->get_logger(), "Threshold changed: %0.2f->%0.2f", threshold, setThreshold);
+      threshold = setThreshold;
     }
     // Step 1: Convert the input image to grayscale
     const int num_channels = 3;
@@ -65,13 +81,12 @@ private:
     greyscalepublisher_->publish(grayscale_msg);
 
     // Step 2: Apply a threshold to the grayscale image
-    const int threshold_value = 100;
     unsigned char *binary_image = new unsigned char[width * height * 3];
     for (int i = 0; i < height; i++)
     {
       for (int j = 0; j < width; j++)
       {
-        if (gray_image[i * width + j] > threshold_value)
+        if (gray_image[i * width + j] > threshold)
         {
           binary_image[(i * width + j) * 3] = 255;     // Red channel
           binary_image[(i * width + j) * 3 + 1] = 255; // Green channel
@@ -146,11 +161,14 @@ private:
     // publisher_->publish(message);
 
     asdfr_interfaces::msg::Point2 message;
-    message.x = x_cog;
-    message.y = y_cog;
+    message.x = (x_cog - width / 2) / width * 2;
+    message.y = -(y_cog - width / 2) / width * 2;
     RCLCPP_INFO(this->get_logger(), "Setpoint = (%d, %d)", x_pos, y_pos);
     targetpublisher_->publish(message);
   };
+  mutable std::string inputimage;
+  mutable double threshold;
+
   rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 

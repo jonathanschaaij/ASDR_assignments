@@ -8,24 +8,24 @@ def generate_launch_description():
             executable="cam2image",
             name='camera',
             parameters=[{"depth": 1}, {"history": "keep_last"}],
-            #remappings=[('/image','/webcam_input')]
         ),
         Node(
             package='brightness_pkg',
             executable='lightposition_node',
-            name='lightpositionnode'
-        ),
-        Node(
-            package='image_tools',
-            executable='showimage',
-            name='originalImage'
+            name='lightpositionnode',
+            arguments=[{"inputimage": "/image"}]
         ),
         # Node(
         #     package='image_tools',
         #     executable='showimage',
-        #     name='grayImage',
-        #     arguments=["image:=/grayImage"]
+        #     name='originalImage'
         # ),
+        Node(
+            package='image_tools',
+            executable='showimage',
+            name='grayImage',
+            arguments=["image:=/grayImage"]
+        ),
         Node(
             package='image_tools',
             executable='showimage',
