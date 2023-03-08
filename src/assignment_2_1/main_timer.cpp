@@ -6,8 +6,11 @@
 #include <signal.h>
 #include <fstream>
 
+bool doStuff = false;
+
 void signalHandler(int signum) {
-    // Do nothing
+    doStuff = true;
+    // std::cout << "Interrupt signal " << std::endl;
 }
 
 void sum_from_1_to_n(int n)
@@ -60,14 +63,10 @@ void *empty_thread_function(void *arg)
     size_t i = 0;
     while (i < count)
     {
-        // std::cout << "In loop 1" << std::endl;
         int sig;
-        sigwait(&set, &sig);
-        if (sig == SIGUSR1) {
-            // Do some calc
+        if (doStuff) {
+            doStuff = false;
             sum_from_1_to_n(1000000);
-            // std::cout << "In loop 3" << std::endl;
-            // Log the time
             clock_gettime(CLOCK_MONOTONIC, &time[i + 1]);
             i ++;
         }
