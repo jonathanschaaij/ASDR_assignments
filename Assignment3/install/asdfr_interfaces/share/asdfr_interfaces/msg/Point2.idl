@@ -1,0 +1,14 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from asdfr_interfaces/msg/Point2.msg
+// generated code does not contain a copyright notice
+
+
+module asdfr_interfaces {
+  module msg {
+    struct Point2 {
+      double x;
+
+      double y;
+    };
+  };
+};
