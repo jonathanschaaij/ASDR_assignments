@@ -1,0 +1,8 @@
+setup.py
+asdfr_interfaces/__init__.py
+asdfr_interfaces.egg-info/PKG-INFO
+asdfr_interfaces.egg-info/SOURCES.txt
+asdfr_interfaces.egg-info/dependency_links.txt
+asdfr_interfaces.egg-info/top_level.txt
+asdfr_interfaces/msg/__init__.py
+asdfr_interfaces/msg/_point2.py
