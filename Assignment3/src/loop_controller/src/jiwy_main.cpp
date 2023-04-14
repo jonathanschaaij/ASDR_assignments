@@ -120,11 +120,14 @@ int main()
         nanosleep(&t, NULL);
         // Wait for Ctrl-C to exit
     }
+    
     printf("Ctrl-C was pressed: Stopping gracefully...\n");
 
     // CLEANUP HERE
     controllerClass.stopThread();
     // controller_runnable->~xenoThread();
     controller_runnable->~runnable();
+
+
     return 0;
 }
